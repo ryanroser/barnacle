@@ -1,10 +1,25 @@
 # barnacle
-A Python web app template providing:
+A Python web app template
+
+## Resources provided
 
 * Flask - http://flask.pocoo.org
 * Celery - 
 * Swagger - 
 * Pytest - http://pytest.org
+
+## Quick Start
+
+*Installation*
+
+Create a virtual environment using the requirements.txt pip file.
+
+*Testing*
+
+Run tests using pytest
+```
+(venv)> py.test
+```
 
 
 References:
