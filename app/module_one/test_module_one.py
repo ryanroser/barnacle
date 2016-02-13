@@ -44,3 +44,8 @@ class TestControllers(object):
     def test_module_one_hi(self):
         rv = self.app.get('/hi/ryan')
         assert "200 OK" == rv.status
+
+    def test_api_say_hi(self):
+        rv = self.app.post('/api/say-hi', content_type="text/plain", data="yo")
+        assert "200 OK" == rv.status
+        assert rv.data == '{\n  "hi": "POST", \n  "text": "yo"\n}'

@@ -1,7 +1,7 @@
 # controllers.py
 
 # Import flask dependencies
-from flask import Blueprint, request, render_template
+from flask import Blueprint, request, render_template, jsonify, json
 
 from .models import greet_user
 
@@ -32,3 +32,32 @@ def hi(visitor_name):
         "greeting": greet_user(visitor_name),
     }
     return render_template("module_one/hi.html", visitor=visitor)
+
+@module_one.route('/api/say-hi', methods=['GET', 'POST', 'PATCH', 'PUT', 'DELETE'])
+def api_say_hi():
+    """
+    A silly example to show how to make an API endpoint
+    and check headers and methods
+    """
+    response = {}
+
+    if request.headers['Content-Type'] == 'text/plain':
+        response['text'] = request.data
+    elif request.headers['Content-Type'] == 'application/json':
+        response['json'] = request.json
+    elif request.headers['Content-Type'] == 'application/octet-stream':
+        #f = open('./binary', 'wb')
+        #f.write(request.data)
+        #        f.close()
+        response['binary'] = "Received %s of binary data" % len(request.data)
+    else:
+        return jsonify({"error": "415 Unsupported Media Type",})
+
+    for method in ['GET', 'POST',]:
+        if request.method == method:
+            response['hi'] = method
+            break
+    else:
+        response['hi'] = 'other methods'
+
+    return jsonify(response)
