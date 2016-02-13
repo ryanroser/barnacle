@@ -1,6 +1,8 @@
 # Import flask dependencies
 from flask import Blueprint, request, render_template
 
+from .models import greet_user
+
 # Import password / encryption helper tools
 # from werkzeug import check_password_hash, generate_password_hash
 
@@ -23,9 +25,8 @@ def index():
 
 @module_one.route('/hi/<visitor_name>', methods=['GET'])
 def hi(visitor_name):
-    visitor = {"name": visitor_name,}
-    if len(visitor_name) % 2 == 0:
-        visitor["greeting"] = "Nice to see you!"
-    else:
-        visitor["greeting"] = "Thanks for visiting!"
+    visitor = {
+        "name": visitor_name,
+        "greeting": greet_user(visitor_name),
+    }
     return render_template("module_one/hi.html", visitor=visitor)
