@@ -1,7 +1,8 @@
 # controllers.py
 
 # Import flask dependencies
-from flask import Blueprint, request, render_template, jsonify, json
+from flask import Blueprint, request, render_template, abort
+from flask_restful import Api, Resource, reqparse
 
 from .models import greet_user
 
@@ -19,6 +20,8 @@ from .models import greet_user
 
 # Define the blueprint: 'module_one'
 module_one = Blueprint('module_one', __name__, template_folder="templates")
+# And create the flask-restful API
+module_one_api = Api(module_one)
 
 # Set the route and accepted methods
 @module_one.route('/', methods=['GET'])
@@ -33,31 +36,34 @@ def hi(visitor_name):
     }
     return render_template("module_one/hi.html", visitor=visitor)
 
-@module_one.route('/api/say-hi', methods=['GET', 'POST', 'PATCH', 'PUT', 'DELETE'])
-def api_say_hi():
+# API Controllers
+
+class SayHi(Resource):
     """
     A silly example to show how to make an API endpoint
     and check headers and methods
     """
-    response = {}
 
-    if request.headers['Content-Type'] == 'text/plain':
-        response['text'] = request.data
-    elif request.headers['Content-Type'] == 'application/json':
+    def get(self):
+        return "Hi!"
+
+    def post(self):
+        # parse args
+        args = self.parser.parse_args()
+        content_type = args.get("Content-Type")
+
+        if content_type != "application/json":
+            abort(415)
+
+        response = {}
+        response["hi"] = "POST"
         response['json'] = request.json
-    elif request.headers['Content-Type'] == 'application/octet-stream':
-        #f = open('./binary', 'wb')
-        #f.write(request.data)
-        #        f.close()
-        response['binary'] = "Received %s of binary data" % len(request.data)
-    else:
-        return jsonify({"error": "415 Unsupported Media Type",})
 
-    for method in ['GET', 'POST',]:
-        if request.method == method:
-            response['hi'] = method
-            break
-    else:
-        response['hi'] = 'other methods'
+        return response
 
-    return jsonify(response)
+    def __init__(self, *args, **kwargs):
+        self.parser = reqparse.RequestParser()
+        self.parser.add_argument('Content-Type', location='headers')
+        super(SayHi, self).__init__(*args, **kwargs)
+
+module_one_api.add_resource(SayHi, "/api/say-hi")

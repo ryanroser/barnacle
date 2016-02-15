@@ -1,5 +1,5 @@
 
-from flask import Flask
+from flask import Flask, json
 from .models import greet_user
 from .controllers import module_one
 
@@ -28,7 +28,6 @@ class TestControllers(object):
         app.config["DEBUG"] = True
         app.config["TESTING"] = True
         app.register_blueprint(module_one)
-        print app.url_map
         self.app = app.test_client()
         #flaskr.init_db()
 
@@ -45,7 +44,14 @@ class TestControllers(object):
         rv = self.app.get('/hi/ryan')
         assert "200 OK" == rv.status
 
-    def test_api_say_hi(self):
-        rv = self.app.post('/api/say-hi', content_type="text/plain", data="yo")
+    def test_api_say_hi_GET(self):
+        rv = self.app.get('/api/say-hi')
         assert "200 OK" == rv.status
-        assert rv.data == '{\n  "hi": "POST", \n  "text": "yo"\n}'
+        assert "application/json" == rv.headers["Content-Type"]
+        assert json.loads(rv.get_data()) == "Hi!"
+
+    def test_api_say_hi_POST(self):
+        rv = self.app.post('/api/say-hi', content_type="application/json", data='["yo"]')
+        assert "200 OK" == rv.status
+        assert "application/json" == rv.headers["Content-Type"]
+        assert json.loads(rv.get_data()) == {"hi": "POST", "json": ["yo"]}
