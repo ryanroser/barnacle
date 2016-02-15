@@ -4,6 +4,7 @@ A Python web app template
 ## Resources provided
 
 * Flask - http://flask.pocoo.org
+* Flask-restful - http://flask-restful.readthedocs.org 
 * Celery - 
 * Swagger - 
 * Pytest - http://pytest.org
