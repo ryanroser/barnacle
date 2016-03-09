@@ -1,4 +1,9 @@
 {% extends "module_one/base.html" %}
 {% block body %}
 <h1>This is the index page for Module 1</h1>
+<ul>
+{% for visitor in visitors %}
+  <li>Say hi to <a href="{{ url_for('module_one.hi', visitor_name=visitor) }}">{{ visitor }}</a></li>
+{% endfor %}
+</ul>
 {% endblock %}

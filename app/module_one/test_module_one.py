@@ -30,6 +30,10 @@ class TestControllers(object):
         app.register_blueprint(module_one)
         self.app = app.test_client()
         #flaskr.init_db()
+        self.api_payload = {
+            "user_name": "Alice",
+            "greeting": "Howdy",
+        }
 
     def teardown_method(self, test_method):
         #os.close(self.db_fd)
@@ -44,14 +48,17 @@ class TestControllers(object):
         rv = self.app.get('/hi/ryan')
         assert "200 OK" == rv.status
 
-    def test_api_say_hi_GET(self):
-        rv = self.app.get('/api/say-hi')
-        assert "200 OK" == rv.status
+    def test_api_list_post(self):
+        rv = self.app.post('/api/greetings',
+            content_type="application/json",
+            data=json.dumps(self.api_payload)
+        )
+        assert "201 CREATED" == rv.status
         assert "application/json" == rv.headers["Content-Type"]
-        assert json.loads(rv.get_data()) == "Hi!"
+        assert json.loads(rv.get_data()) == self.api_payload
 
-    def test_api_say_hi_POST(self):
-        rv = self.app.post('/api/say-hi', content_type="application/json", data='["yo"]')
+    def test_api_list_get(self):
+        rv = self.app.get('/api/greetings')
         assert "200 OK" == rv.status
         assert "application/json" == rv.headers["Content-Type"]
-        assert json.loads(rv.get_data()) == {"hi": "POST", "json": ["yo"]}
+        assert json.loads(rv.get_data()) == [self.api_payload,]
